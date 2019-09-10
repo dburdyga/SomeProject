@@ -10,28 +10,31 @@ Vue.component('product', {
             <div class="product-image">
                 <img :src="image">
             </div>
+            
             <div class="product-info">
                 <h1>{{ title }}</h1>
                 <p v-if="inStock">In stock</p>
                 <p v-else>Out of stock</p>
                 <p>Shipping: {{ shipping }}</p>
+                
                 <ul>
                     <li v-for="detail in details">{{ detail }}</li>
                 </ul>
-                <div v-for="(variant, index) in variants"
+                
+                <div class="color-box"
+                     v-for="(variant, index) in variants"
                      :key="variant.variantId"
-                     class="color-box"
                      :style="{backgroundColor: variant.variantColor}"
                      @mouseover="updateProduct(index)"
                 >
                 </div>
+                
                 <button v-on:click="addToCart"
-                        :disabled="inStock"
+                        :disabled="!inStock"
                         :class="{disabledButton: !inStock}"
-                >Add to Cart</button>
-                <div class="cart">
-                    <p>Cart({{cart}})</p>
-                </div>
+                >Add to Cart
+                </button>
+               
             </div>
             </div>
 `,
@@ -55,12 +58,11 @@ Vue.component('product', {
                     variantQuantity: 0
                 }
             ],
-            cart: 0
         }
     },
     methods: {
         addToCart() {
-            this.cart +=1
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId)
         },
         updateProduct(index) {
             this.selectedVariant = index
@@ -90,7 +92,13 @@ Vue.component('product', {
 var app = new Vue ({
     el: '#app',
     data: {
-        premium: false
+        premium: false,
+        cart: []
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id)
+        }
     }
 
 });
