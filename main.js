@@ -36,19 +36,8 @@ Vue.component('product', {
                 </button>
             </div>
             
-            <div>
-                <h2>Reviews</h2>
-                <p v-if="!reviews.length">There are no reviews yet.</p>
-                <ul>
-                    <li v-for="review in reviews">
-                        <p>{{ review.name }}</p>
-                        <p>Rating: {{ review.rating }}</p>
-                        <p>{{ review.review }}</p>
-                    </li>
-                </ul>
-            </div>
+            <product-tabs :reviews='reviews'></product-tabs>
             
-            <product-review @review-submitted="addReview"></product-review>
             </div>
 `,
     data() {
@@ -172,6 +161,47 @@ Vue.component('product-review', {
                 if(!this.rating) this.errors.push("Ratting required")
             }
 
+        }
+    }
+})
+
+
+Vue.component('product-tabs', {
+    props: {
+        reviews: {
+            type: Array,
+            required: true
+        }
+    },
+    template: `
+    <div>
+        <span class="tab"
+              :class="{ activeTab: selectedTab === tab}"
+              v-for="(tab, index) in tabs" 
+              :key="index"
+              @click="selectedTab = tab">
+              {{ tab }}
+        </span>
+        <div v-show="selectedTab === 'Reviews'">
+            <p v-if="!reviews.length">There are no reviews yet.</p>
+            <ul v-else>
+                    <li v-for="(review, index) in reviews" :key="index">
+                      <p>{{ review.name }}</p>
+                      <p>Rating:{{ review.rating }}</p>
+                      <p>{{ review.review }}</p>
+                    </li>
+            </ul>
+        </div>
+            
+            <product-review v-show="selectedTab === 'Make a Review'"
+            @review-submitted="addReview"></product-review>
+        
+    </div>
+    `,
+    data() {
+        return {
+            tabs: ['Reviews', 'Make a Review'],
+            selectedTab: 'Reviews'
         }
     }
 })
